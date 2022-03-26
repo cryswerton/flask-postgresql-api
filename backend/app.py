@@ -51,5 +51,20 @@ def get_users():
         user_list.append(format_event(user))
     return {'users': user_list}
 
+# get a single user
+@app.route('/users/<id>', methods=['GET'])
+def get_user(id):
+    user = Event.query.filter_by(id=id).one()
+    formatted_event = format_event(user)
+    return {'user': formatted_event}
+
+# delete an user
+@app.route('/users/<id>', methods=['DELETE'])
+def delete_user(id):
+    user = Event.query.filter_by(id=id).one()
+    db.session.delete(user)
+    db.session.commit()
+    return f'User (id: {id}) deleted succesfully!'
+
 if __name__=='__main__':
     app.run()
