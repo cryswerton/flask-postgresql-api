@@ -1,0 +1,2 @@
+pipenv shell = start enviorment
+flask run = start flask app
