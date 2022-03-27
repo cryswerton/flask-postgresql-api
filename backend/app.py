@@ -1,3 +1,4 @@
+import email
 from pydoc import describe
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
@@ -52,19 +53,28 @@ def get_users():
     return {'users': user_list}
 
 # get a single user
-@app.route('/users/<id>', methods=['GET'])
+@app.route('/users/get/<id>', methods=['GET'])
 def get_user(id):
     user = Event.query.filter_by(id=id).one()
     formatted_event = format_event(user)
     return {'user': formatted_event}
 
 # delete an user
-@app.route('/users/<id>', methods=['DELETE'])
+@app.route('/users/delete/<id>', methods=['DELETE'])
 def delete_user(id):
     user = Event.query.filter_by(id=id).one()
     db.session.delete(user)
     db.session.commit()
     return f'User (id: {id}) deleted succesfully!'
+
+@app.route('/users/update/<id>', methods=['PUT'])
+def update_user(id):
+    user = Event.query.filter_by(id=id)
+    name = request.json['name']
+    email = request.json['email']
+    user.update(dict(name=name, email=email, created_at=datetime.utcnow()))
+    db.session.commit()
+    return {'event': format_event(user.one())}
 
 if __name__=='__main__':
     app.run()
