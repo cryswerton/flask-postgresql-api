@@ -1,13 +1,14 @@
-import email
-from pydoc import describe
+import config
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:cwss1994@localhost/users'
+# for personal safety reasons the password is imported from a python external file that is not committed on Git
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://postgres:{config.passwd}@localhost/users'
 db = SQLAlchemy(app)
 
+# python uses this class to create a table on the database
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
