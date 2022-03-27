@@ -1,2 +1,6 @@
+create the table off of the class by doing it in the python console in the backend folder:
+    from app import db
+    db.create_all()
+
 pipenv shell = start enviorment
 flask run = start flask app
