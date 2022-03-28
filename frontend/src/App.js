@@ -24,9 +24,17 @@ function App() {
     setEmail(e.target.value)
   }
 
-  const handleSubmit = e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(name, email)
+    try{
+      const data = await axios.post(`${baseURL}/users/new`, {name, email})
+      setUserList([...userList, data.data])
+      setName('')
+      setEmail('')
+    }catch(err){
+      console.error(err.message)
+    }
+
   }
 
   useEffect(() => {
