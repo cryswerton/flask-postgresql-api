@@ -24,6 +24,16 @@ function App() {
     setEmail(e.target.value)
   }
 
+  const handleDelete = async (id) => {
+    try{
+      await axios.delete(`${baseURL}/users/delete/${id}`)
+      const updatedList = userList.filter(user => user.id !== id)
+      setUserList(updatedList)
+    } catch(err){
+      console.error(err.message)
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try{
@@ -67,7 +77,10 @@ function App() {
           <ul>
             {userList.map( user => {
               return(
-                <li key={user.id}>{user.name}</li>
+                <li style={{display: "flex"}} key={user.id}>
+                  {user.name}
+                  <button onClick={ () => handleDelete(user.id)}>X</button>
+                </li>
               )
             })}
           </ul>
