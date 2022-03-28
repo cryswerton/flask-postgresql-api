@@ -2,11 +2,13 @@ import config
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from flask_cors import CORS
 
 app = Flask(__name__)
 # for personal safety reasons the password is imported from a python external file that is not committed on Git
 app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://postgres:{config.passwd}@localhost/users'
 db = SQLAlchemy(app)
+CORS(app)
 
 # python uses this class to create a table on the database
 class User(db.Model):
