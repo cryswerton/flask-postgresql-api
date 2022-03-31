@@ -14,21 +14,18 @@ CORS(app)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100))
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
-        return f"User: {self.name} and {self.email}"
+        return f"User: {self.name}"
 
-    def __init__(self, name, email):
+    def __init__(self, name):
         self.name = name
-        self.email = email
 
 def format_user(user):
     return {
         "id": user.id,
         "name": user.name,
-        "email": user.email,
         "created_at": user.created_at
     }
 
@@ -40,8 +37,7 @@ def hello():
 @app.route('/users/new', methods=['POST'])
 def create_user():
     name = request.json['name']
-    email = request.json['email']
-    user = User(name, email)
+    user = User(name)
     db.session.add(user)
     db.session.commit()
     return format_user(user)
@@ -74,8 +70,7 @@ def delete_user(id):
 def update_user(id):
     user = User.query.filter_by(id=id)
     name = request.json['name']
-    email = request.json['email']
-    user.update(dict(name=name, email=email, created_at=datetime.utcnow()))
+    user.update(dict(name=name, created_at=datetime.utcnow()))
     db.session.commit()
     return {'user': format_user(user.one())}
 

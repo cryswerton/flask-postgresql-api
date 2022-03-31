@@ -2,12 +2,14 @@ import {useEffect, useState} from 'react'
 import axios from "axios"
 import {format} from "date-fns"
 import './App.css';
+import { toBeInTheDocument } from '@testing-library/jest-dom/dist/matchers';
 
 const baseURL = "http://localhost:5000"
 
 function App() {
   const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
+  const [editName, setEditName] = useState('')
+  const [userId, setUserId] = useState(null)
   const [userList, setUserList] = useState([])
 
   const fetchUsers = async () => {
@@ -20,10 +22,6 @@ function App() {
     setName(e.target.value)
   }
 
-  const handleEmailChange = e => {
-    setEmail(e.target.value)
-  }
-
   const handleDelete = async (id) => {
     try{
       await axios.delete(`${baseURL}/users/delete/${id}`)
@@ -34,13 +32,37 @@ function App() {
     }
   }
 
+  const toggleEdit = (user) => {
+    setUserId(user.id)
+    setEditName(user.name)
+  }
+
+  const handleChange = (e, field) => {
+    if(field === 'edit'){
+      setEditName(e.target.value)
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try{
-      const data = await axios.post(`${baseURL}/users/new`, {name, email})
-      setUserList([...userList, data.data])
-      setName('')
-      setEmail('')
+      if(editName){
+        const data = await axios.put(`${baseURL}/users/update/${userId}`, {name: editName})
+        const updatedUser = data.data.user
+        const updatedList = userList.map(user => {
+          if(user.id === userId){
+            return user = updatedUser
+          }
+          return user
+        })
+        setUserList(updatedList)
+        }else{
+          const data = await axios.post(`${baseURL}/users/new`, {name})
+          setUserList([...userList, data.data])
+        }
+        setName('')
+        setEditName('')
+        setUserId(null)
     }catch(err){
       console.error(err.message)
     }
@@ -63,25 +85,35 @@ function App() {
             id="name"
             value={name}
           />
-          <label htmlFor='email'>Email</label>
-          <input
-            onChange={handleEmailChange}
-            type="text"
-            name="email"
-            id="email"
-            value={email}
-          />
           <button type="submit">Submit</button>
         </form>
         <section>
           <ul>
             {userList.map( user => {
-              return(
-                <li style={{display: "flex"}} key={user.id}>
-                  {user.name}
-                  <button onClick={ () => handleDelete(user.id)}>X</button>
-                </li>
-              )
+              if(userId === user.id){
+                return(
+                  <li>
+                    <form onSubmit={handleSubmit} key={user.id}>
+                    <input
+                      onChange={(e) => handleChange(e, 'edit')}
+                      type="text"
+                      name="editName"
+                      id="editName"
+                      value={editName}
+                    />
+                    <button type='submit'>Submit</button>
+                    </form>
+                  </li>
+                )
+              } else {
+                return(
+                  <li style={{display: 'flex'}} key={user.id}>
+                    {user.name}
+                    <button onClick={() => toggleEdit(user)}>Edit</button>
+                    <button onClick={() => handleDelete(user.id)}>X</button>
+                  </li>
+                )
+              }
             })}
           </ul>
         </section>
