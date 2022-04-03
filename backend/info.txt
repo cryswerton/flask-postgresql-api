@@ -2,5 +2,8 @@ create the table off of the class by doing it in the python console in the backe
     from app import db
     db.create_all()
 
+pip install pipenv
+pipenv install flask flask-sqlalchemy psycopg2 python-dotenv flask-cors
 pipenv shell = start enviorment
 flask run = start flask app
+
